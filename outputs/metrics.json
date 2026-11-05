@@ -1,0 +1,30 @@
+{
+  "selected_model": "Damped ETS",
+  "selection": "mean rolling-origin RMSE; fixed models; no test selection",
+  "test_years": [
+    2022,
+    2023,
+    2024
+  ],
+  "test_metrics": {
+    "mae": 4.951766942318888,
+    "rmse": 5.847477549018667,
+    "mape_pct": 2.902582543481048
+  },
+  "forecast_cutoff": 2024,
+  "forecast": [
+    {
+      "year": 2025,
+      "forecast": 180.89526234317992
+    },
+    {
+      "year": 2026,
+      "forecast": 189.23360850967816
+    },
+    {
+      "year": 2027,
+      "forecast": 197.75174537449797
+    }
+  ],
+  "ljung_box_p": 0.4121123993524611
+}

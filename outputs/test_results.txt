@@ -1,0 +1,9 @@
+test_actual_results_and_reports_exist (test_integrity.SourceIntegrity.test_actual_results_and_reports_exist) ... ok
+test_snapshot_checksums (test_integrity.SourceIntegrity.test_snapshot_checksums) ... ok
+test_evaluation_never_precedes_origin_or_enters_holdout (test_integrity.TemporalIntegrity.test_evaluation_never_precedes_origin_or_enters_holdout) ... ok
+test_naive_baseline_has_no_future_information (test_integrity.TemporalIntegrity.test_naive_baseline_has_no_future_information) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.049s
+
+OK

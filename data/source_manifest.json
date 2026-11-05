@@ -1,0 +1,8 @@
+{
+  "indonesia_cpi.json": {
+    "url": "https://api.worldbank.org/v2/country/IDN/indicator/FP.CPI.TOTL?date=1970:2024&format=json&per_page=1000",
+    "retrieved_utc": "2026-11-05T10:54:02.777339+00:00",
+    "sha256": "6960318b852afb171bb063f0a9868f15dd13a6dfd1cbfaa9559afe9a85d79015",
+    "bytes": 12295
+  }
+}

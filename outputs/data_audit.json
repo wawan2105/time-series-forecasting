@@ -1,0 +1,17 @@
+{
+  "rows": 55,
+  "start": 1970,
+  "end": 2024,
+  "missing": 0,
+  "frequency": "annual",
+  "unit": "CPI 2010=100",
+  "api_metadata": {
+    "page": 1,
+    "pages": 1,
+    "per_page": 1000,
+    "total": 55,
+    "sourceid": "2",
+    "lastupdated": "2026-10-08"
+  },
+  "seasonal_models": "not identifiable for annual observations; no SARIMA/STL/Holt-Winters seasonality imposed"
+}
