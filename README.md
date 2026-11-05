@@ -1,38 +1,53 @@
-# Forecasting Indonesian CPI with Statistical and Machine Learning Models
+# Forecasting Indonesian Consumer Prices
 
-**Wawan Saputra | Independent Portfolio Project | 2026 | Project 2/8**
+**Wawan Saputra · Time Series & Statistical Modeling · 2026**
 
-## Overview
-Project terimplementasi dengan data publik, kode analisis yang dapat dijalankan, notebook, tabel dan grafik hasil eksekusi aktual. Tidak menggunakan hasil numerik sintetis.
+An expanding-window comparison of statistical and machine-learning forecasts for Indonesian CPI. The analysis selects a model before evaluating the final three-year holdout.
 
-## Research / Business Question
-Bagaimana performa ARIMA, exponential smoothing dan benchmark machine learning dalam meramalkan CPI tahunan Indonesia?
+[Executive summary](outputs/executive_summary.md) · [Backtest tables](outputs/tables/model_comparison.csv) · [Notebooks](notebooks) · [Data attribution](THIRD_PARTY_DATA.md)
 
-## Dataset
-World Bank / IMF CPI Indonesia, indikator FP.CPI.TOTL (2010=100), 1970–2024; 55 observasi tahunan.
+## Main finding
 
-Sumber: [dokumentasi sumber](https://data.worldbank.org/indicator/FP.CPI.TOTL?locations=ID). URL unduhan, waktu pengambilan UTC, ukuran dan SHA-256 tersedia pada `data/source_manifest.json`. Snapshot sumber disimpan di `data/raw/`, sehingga rerun analisis menggunakan data yang sama. Atribusi dan batas penggunaan tercantum di [THIRD_PARTY_DATA.md](THIRD_PARTY_DATA.md).
+**Damped ETS** achieved the lowest rolling-origin RMSE among five fixed candidates. On the separate **2022–2024** holdout:
 
-## Methods
-Naive, log drift, ARIMA(1,1,1) dengan drift, damped ETS, recursive Random Forest pada lag log-growth; expanding rolling-origin validation; MAE/RMSE/MAPE; ADF, ACF/PACF dan residual Ljung–Box.
+| Metric | Held-out result |
+|---|---:|
+| MAE | 4.952 CPI points |
+| RMSE | 5.847 CPI points |
+| MAPE | 2.90% |
 
-## Scope and Assumptions
-Data tahunan tidak mendukung identifikasi musim dalam satu tahun. Karena itu SARIMA musiman dan seasonal decomposition tidak dipaksakan; tersedia dekomposisi trend/remainder deskriptif. Cutoff tetap 2024; forecast 2025–2027 merupakan eksperimen retrospektif, bukan ramalan terkini.
+![Historical holdout forecast](outputs/figures/test_forecast.png)
 
-## Workflow
-1. Baca atau unduh snapshot sumber; verifikasi checksum dan validasi data.
-2. Bentuk dataset analisis dengan aturan yang terdokumentasi.
-3. Jalankan metode statistik/model sesuai desain studi.
-4. Simpan hasil, diagnostik, visualisasi dan ringkasan interpretasi.
+## Question and data
 
-## Key Results and Interpretation
-Lihat [executive summary](outputs/executive_summary.md) untuk hasil aktual, interpretasi, rekomendasi, limitations, dan dua bullet CV. Hasil terstruktur tersedia di [metrics.json](outputs/metrics.json), dengan tabel pendukung di `outputs/tables/`. Angka README tidak digandakan agar tidak tertinggal dari hasil rerun.
+Can annual price-index forecasts improve on simple naive and drift benchmarks? The dataset is **World Bank/IMF CPI for Indonesia, 1970–2024**, 55 annual observations, indicator `FP.CPI.TOTL`, **2010=100**. CPI levels and annual inflation rates are distinct.
 
-## Visualizations
-![Hasil utama](outputs/figures/test_forecast.png)
+The cutoff is deliberately fixed at **2024**. Forecasts for 2025–2027 are retrospective outputs from that cutoff, not a current economic outlook. Raw JSON, retrieval metadata and SHA-256 checksums are retained. See [attribution and CC BY 4.0 terms](THIRD_PARTY_DATA.md).
 
-## Reproducibility
-Python 3.11 diuji. Jalankan perintah berikut dari folder project. `requirements-lock.txt` mencatat versi paket yang benar-benar digunakan; `requirements.txt` adalah daftar dependensi langsung. Gunakan environment terpisah untuk setiap project.
+## Methods and leakage controls
+
+- Naive, log drift, ARIMA(1,1,1) with drift, damped ETS on log CPI, and recursive random forest using three past log-growth lags.
+- Expanding origins **2009, 2012, 2015, 2018**, each with a three-year horizon; all end before the final holdout.
+- Select by mean rolling-origin RMSE. No random splitting, test-based tuning or future lag values.
+- ADF, ACF/PACF, trend/remainder plots, robust growth-anomaly flags and residual Ljung–Box diagnostics.
+
+Annual observations cannot identify within-year seasonality, so no artificial seasonal period, SARIMA seasonality or seasonal decomposition is imposed. Crisis observations are retained.
+
+## Rolling-origin comparison
+
+These are **pre-test averages across origins**, not the final holdout metrics above.
+
+| model              |    mae |   rmse |   mape_pct |
+|:-------------------|-------:|-------:|-----------:|
+| Damped ETS         |  7.610 |  8.399 |      5.654 |
+| Random Forest lags | 10.217 | 11.154 |      7.901 |
+| Naive              | 10.366 | 11.163 |      8.068 |
+| ARIMA(1,1,1)       | 16.161 | 18.387 |     11.856 |
+| Drift              | 18.849 | 20.849 |     13.948 |
+
+## Reproduce
+
+Python 3.11 was tested. From this repository:
 
 ```powershell
 python -m venv .venv
@@ -41,32 +56,12 @@ python -m venv .venv
 .\.venv\Scripts\python.exe -m unittest discover -s tests -v
 ```
 
-
-Untuk membuka notebook: instal `jupyterlab ipykernel`, lalu `python -m jupyterlab`. Notebook EDA, modeling dan reporting membaca snapshot/hasil yang disimpan. Notebook modeling menjelaskan dan menyediakan perintah rerun analisis; tidak melatih ulang secara tersembunyi ketika sekadar melihat hasil. Seluruh notebook telah dieksekusi untuk pemeriksaan.
-
-## Repository Structure
-```text
-time-series-forecasting/
-├── README.md
-├── THIRD_PARTY_DATA.md
-├── data/                 # raw, processed, source manifest
-├── notebooks/            # EDA, modeling, interpretation
-├── src/                  # reusable analysis functions and CLI
-├── tests/                # meaningful integrity and statistical checks
-├── outputs/
-│   ├── figures/
-│   ├── tables/
-│   ├── metrics.json
-│   ├── environment.json
-│   └── executive_summary.md
-├── requirements.txt
-└── requirements-lock.txt
-```
+Linux/macOS: use `.venv/bin/python`. Direct dependencies are pinned; transitive versions are resolved by pip. Cached raw data are checksum-verified. Three executed notebooks cover EDA, model evaluation and interpretation; set their explicit rebuild switch only when retraining is intended.
 
 ## Limitations and Future Work
-Data tahunan tidak mendukung identifikasi musim dalam satu tahun. Karena itu SARIMA musiman dan seasonal decomposition tidak dipaksakan; tersedia dekomposisi trend/remainder deskriptif. Cutoff tetap 2024; forecast 2025–2027 merupakan eksperimen retrospektif, bukan ramalan terkini.
 
-Batasan spesifik dan rencana pengembangan dibahas dalam executive summary. Hasil adalah portfolio riset terapan yang bergantung pada dataset dan asumsi; tidak menggantikan validasi lapangan atau penerapan produksi.
+Only 55 observations, structural breaks and latest-vintage revisions; this is not real-time vintage backtesting. Exponentiated log forecasts are median-scale estimates. The selected ETS outputs are **point forecasts without prediction intervals**. No exogenous predictors or superiority significance test is claimed. Future work: monthly data, uncertainty calibration, additional origins and vintage-aware evaluation.
 
-## Author
-Wawan Saputra
+## Repository guide
+
+`src/run.py` data/model/evaluation functions · `data/` snapshots and processed CPI · `notebooks/` executed walkthroughs · `outputs/tables/` origins, forecasts and diagnostics · `outputs/figures/` plots · `tests/` temporal-integrity checks.
